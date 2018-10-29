@@ -18,7 +18,7 @@ drop table [dbo].tcourseinstance
 drop table [dbo].tclient
 drop table [dbo].tcourse --be mindful of the order
 drop table [dbo].[ttrainer]
-drop table [dbo].[ttrainerlead]
+--drop table [dbo].[ttrainerlead]
 drop table [dbo].tTrainerQualification
 drop TABLE [dbo].tBuilding
 drop TABLE [dbo].tRoom
@@ -36,16 +36,7 @@ drop TABLE [dbo].tFacility
 
 
 
-CREATE TABLE [dbo].tcourse(
-	[Code] [nvarchar] (4) primary key NOT NULL ,
-	[Title] [nvarchar](30) NOT NULL,
-	[Duration] [tinyint] NOT NULL CHECK(Duration BETWEEN 1 AND 10),
-	[Cost] [Money] NOT NULL CHECK(Cost BETWEEN 100 AND 5000),
-	[leadTrainerId] int not null,
-	FOREIGN KEY([leadTrainerid]) REFERENCES [dbo].ttrainer ([trainerid])
 
-) ON [PRIMARY]
-GO
 
 CREATE TABLE [dbo].tclient (
 	[clientNumber] int primary key NOT NULL,
@@ -61,6 +52,16 @@ CREATE TABLE [dbo].tTrainer(
 	Forename nvarchar(20) not null,
 	[Address] ntext not null,
 	Email varchar(254) not null CHECK(Email LIKE '%___@___%.__%')
+) ON [PRIMARY]
+GO
+CREATE TABLE [dbo].tcourse(
+	[Code] [nvarchar] (4) primary key NOT NULL ,
+	[Title] [nvarchar](30) NOT NULL,
+	[Duration] [tinyint] NOT NULL CHECK(Duration BETWEEN 1 AND 10),
+	[Cost] [Money] NOT NULL CHECK(Cost BETWEEN 100 AND 5000),
+	[leadTrainerId] int not null,
+	FOREIGN KEY([leadTrainerid]) REFERENCES [dbo].ttrainer ([trainerid])
+
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tcourseinstance(
@@ -181,7 +182,8 @@ INSERT INTO [dbo].[tcourse]
            ('RedBuild 4GL'
            ,'B401'
            ,5
-           ,1150),
+           ,1150,
+		   1),
            ('RedMan - projects'
            ,'MP01'
            ,3
@@ -205,7 +207,8 @@ INSERT INTO [dbo].[tcourse]
            ('RedBase tuning'
            ,'DT01'
            ,1
-           ,300),
+           ,300
+		   ,2),
            ('RedNet'
            ,'RN01'
            ,2
@@ -213,12 +216,6 @@ INSERT INTO [dbo].[tcourse]
 		   ,3)
 
 set dateformat dmy
-
-
-
-
-
-
 
 INSERT INTO [dbo].[tcourseinstance]
            ([CourseCode]
