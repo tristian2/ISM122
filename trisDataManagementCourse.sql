@@ -339,7 +339,7 @@ INSERT INTO [dbo].[tcourseinstance]
            ,4
 		   ,2),
            ('MP01'
-           ,CAST('28/2/2019' AS DATETIME)
+           ,CAST('28/11/2018' AS DATETIME)
            ,1
 		   ,1),
            ('RC22'
@@ -379,7 +379,7 @@ INSERT INTO [dbo].[tcourseinstance]
            ,3
 		   ,4),		   
            ('RN01'
-           ,CAST('16/6/2019' AS DATETIME)
+           ,CAST('16/12/2018' AS DATETIME)
            ,4
 		   ,5)		
 GO
