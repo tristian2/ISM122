@@ -311,9 +311,15 @@ insert into tTrainerQualification
 	 ,courseCode)
 	 VALUES 
 		(1,'RC22'),
+		(1,'RS01'),
+		(1,'B401'),
+		(1,'MP01'),
 		(2,'RS01'),
+		(2,'B401'),
+		(2,'MP01'),
 		(3,'B401'),
-		(4,'MP01')
+		(4,'MP01'),
+		(4,'RC22')
 go
 INSERT INTO [dbo].[tcourseinstance]
            ([CourseCode]
@@ -427,7 +433,7 @@ INSERT INTO [dbo].[tdelegate]
            ,CAST('11/4/2019' AS DATETIME)
            ,13)
 
-
+drop view [dbo].[vwTrainerQualificationsTest]
 drop view [dbo].vwExpensiveCourses
 drop view [dbo].vwMediumDurationCourses
 drop view [dbo].vwRedbaseCourses
@@ -440,6 +446,14 @@ drop view [dbo].[vwCoursesTaughtByKatie]
 drop view [dbo].vwCoursesLongerThan1dAfterFeb2013
 drop view [dbo].vwCourseInstanceDates
 go
+--test view to see what course a trainer can deliver
+CREATE VIEW [dbo].[vwTrainerQualificationsTest]
+AS
+SELECT        dbo.tTrainer.trainerId, dbo.tTrainer.Surname, dbo.tTrainer.Forename, dbo.tTrainer.Address, dbo.tTrainer.Email, dbo.tTrainerQualification.trainerId AS Expr1, dbo.tTrainerQualification.courseCode
+FROM            dbo.tTrainer INNER JOIN
+                         dbo.tTrainerQualification ON dbo.tTrainer.trainerId = dbo.tTrainerQualification.trainerId
+GO
+
 CREATE VIEW [dbo].vwExpensiveCourses
 AS
 SELECT        Title, Code, Duration, Cost
