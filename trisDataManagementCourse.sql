@@ -50,12 +50,12 @@ CREATE TABLE [dbo].tclient (
 )
 GO
 CREATE TABLE [dbo].tTrainer(
-	trainerId  int primary key NOT NULL,
-	Surname nvarchar(30) not null,
-	Forename nvarchar(20) not null,
-	[Address] ntext not null,
-	Email varchar(254) not null CHECK(Email LIKE '%___@___%.__%')--,
-	--FOREIGN KEY([trainerid]) REFERENCES ttrainerqualification (trainerQualificationId)
+	trainerId  int primary key identity(1,1) NOT NULL,
+	Surname nvarchar(30) not null CHECK(surname<>N''),
+	Forename nvarchar(20) not null CHECK(forename<>N''),
+	[Address] nvarchar(max) not null CHECK ([address]<>N''),
+	Email varchar(254) not null CHECK(Email LIKE '%___@___%.__%')
+	--this was an idea, but problem of circular keys! FOREIGN KEY([trainerid]) REFERENCES ttrainerqualification (trainerQualificationId)
 
 ) ON [PRIMARY]
 GO
@@ -227,17 +227,16 @@ insert into [dbo].[tRoomFacility]
 			(4, 1),
 			(5, 1)
 go
-insert into ttrainer
-           (trainerid
-		   ,surname
+insert into [dbo].[ttrainer]
+           (surname
 		   ,forename
 		   ,[address]
 		   ,email)
 		VALUES
-           (1,'Fawsett','Katie','12 bonchurch road, bn2 3ph','k80@fawsett.com'),
-		   (2,'Symonds','Bob','13 frankline road, bn2 3ah','bobs@symonds.net'),
-		   (3,'Parsnip','Jill','13 southover street, bn2 1as','jilly256@hotmail.com'),
-		   (4,'French','Glynn','23 acacia road, cr0 3ph','spaceman@arrarrarr.com')
+           ('Fawsett','Katie','12 bonchurch road, bn2 3ph','k80@fawsett.com'),
+		   ('Symonds','Bob','13 frankline road, bn2 3ah','bobs@symonds.net'),
+		   ('Parsnip','Jill','13 southover street, bn2 1as','jilly256@hotmail.com'),
+		   ('French','Glynn','23 acacia road, cr0 3ph','spaceman@arrarrarr.com')
 go
 INSERT INTO [dbo].[tcourse]
            ([Title]
