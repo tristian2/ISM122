@@ -505,3 +505,61 @@ as
 select * from tcourse c join tcourseinstance ci
 on c.code = ci.coursecode
 where coursedate > '1/3/2013'
+
+go
+
+
+-- =============================================
+-- Author:		Tristian O'Brien
+-- Create date: 8th November 2018
+-- Description:	Allows the addition of a trainer and their skillz (qualifications)
+--				skillz, should be the course coded as csv e.g. 'RS01','B401' etc.
+-- =============================================
+--CREATE PROCEDURE spAddNewTrainer
+Alter PROCEDURE spAddNewTrainer
+	@surname nvarchar(30),
+	@forename nvarchar(20),
+	@address ntext,
+	@email varchar(254),
+	@qualifications nvarchar(1000)	
+AS
+BEGIN
+SET NOCOUNT ON;
+
+Declare @vmaxid int
+select @vmaxid = max(trainerId) from [dbo].[tTrainer]
+	begin try
+		begin transaction
+			INSERT INTO [dbo].[tTrainer]
+				   ([Surname]
+				   ,[Forename]
+				   ,[Address]
+				   ,[Email])
+			 VALUES
+				   (@Surname
+				   ,@Forename
+				   ,@Address
+				   ,@Email)
+			insert into [dbo].[tTrainerQualification] (trainerid, coursecode)
+			SELECT @@identity as tid,value FROM string_split(@qualifications,',')
+		commit transaction
+
+		--we'll return the courses for the next two months for that new trainer
+		select coursecode, coursedate from [dbo].[tcourseinstance] 
+		where coursecode in (select value from string_split(@qualifications,',')) 
+			and coursedate between GETDATE() and DATEADD(m,2,GETDATE())
+
+	end try
+	begin catch
+	  raiserror('Failed to add trainer.  check your input!  does name, address and email satisfy their constraints?', 16, 1)
+	  rollback transaction
+		print 'identity in catch block'
+		print @@identity	  
+		--reseed the identity value
+		set @vmaxid = @vmaxid
+		DBCC CHECKIDENT (tTrainer, reseed, @vmaxid)
+	  return
+	end catch	
+SET NOCOUNT OFF;	
+END
+GO
