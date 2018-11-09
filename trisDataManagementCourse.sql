@@ -1,4 +1,4 @@
-/* redsoft training amterials scripts
+/* redsoft training materials scripts
 if using my machine, use the command blow to open an instance of sql server management studio
 runas /netonly /user:UNIVERSITY\tso14 ssms.exe
 tristian o'brien october 2018*/
@@ -16,17 +16,17 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 
-drop table [dbo].tdelegate
-drop table [dbo].tcourseinstance
+drop table [dbo].tDelegate
+drop table [dbo].tCourseInstance
 drop TABLE [dbo].tRoomFacility
 drop TABLE [dbo].tCourseFacility
 drop TABLE [dbo].tFacility
 drop TABLE [dbo].tRoom
 drop TABLE [dbo].tBuilding
 drop table [dbo].tTrainerQualification
-drop table [dbo].tcourse 
-drop table [dbo].[ttrainer]
-drop table [dbo].tclient
+drop table [dbo].tCourse 
+drop table [dbo].tTrainer
+drop table [dbo].tClient
 
 CREATE TABLE [dbo].tBuilding(
 	buildingId   int primary key NOT NULL,
@@ -37,11 +37,11 @@ CREATE TABLE [dbo].tRoom(
 	roomId   int primary key NOT NULL,
 	room [nvarchar] (30) NOT NULL,
 	buildingId int not null,
-	FOREIGN KEY(buildingId) REFERENCES [dbo].tbuilding	 (buildingId)
+	FOREIGN KEY(buildingId) REFERENCES [dbo].tBuilding	 (buildingId)
 
 ) ON [PRIMARY]
 GO
-CREATE TABLE [dbo].tclient (
+CREATE TABLE [dbo].tClient (
 	[clientNumber] int primary key NOT NULL,
 	surname nvarchar(100) NOT NULL,
 	forename nvarchar(100) NOT NULL,
@@ -51,48 +51,48 @@ CREATE TABLE [dbo].tclient (
 GO
 CREATE TABLE [dbo].tTrainer(
 	trainerId  int primary key identity(1,1) NOT NULL,
-	Surname nvarchar(30) not null CHECK(surname<>N''),
-	Forename nvarchar(20) not null CHECK(forename<>N''),
-	[Address] nvarchar(max) not null CHECK ([address]<>N''),
-	Email varchar(254) not null CHECK(Email LIKE '%___@___%.__%')
-	--this was an idea, but problem of circular keys! FOREIGN KEY([trainerid]) REFERENCES ttrainerqualification (trainerQualificationId)
+	surname nvarchar(30) not null CHECK(surname<>N''),
+	forename nvarchar(20) not null CHECK(forename<>N''),
+	[address] nvarchar(max) not null CHECK ([address]<>N''),
+	email varchar(254) not null CHECK(email LIKE '%___@___%.__%')
+	--this was an idea, but problem of circular keys! FOREIGN KEY([trainerId]) REFERENCES tTrainerQualification (trainerQualificationId)
 
 ) ON [PRIMARY]
 GO
-CREATE TABLE [dbo].tcourse(
-	[Code] [nvarchar] (4) primary key NOT NULL ,
-	[Title] [nvarchar](30) NOT NULL,
-	[Duration] [tinyint] NOT NULL CHECK(Duration BETWEEN 1 AND 10),
-	[Cost] [Money] NOT NULL CHECK(Cost BETWEEN 100 AND 5000),
-	[leadTrainerId] int not null,
-	FOREIGN KEY([leadTrainerid]) REFERENCES [dbo].ttrainer ([trainerid])
+CREATE TABLE [dbo].tCourse(
+	[code] [nvarchar] (4) primary key NOT NULL ,
+	[title] [nvarchar](30) NOT NULL,
+	[duration] [tinyint] NOT NULL CHECK(duration BETWEEN 1 AND 10),
+	[cost] [Money] NOT NULL CHECK(cost BETWEEN 100 AND 5000),
+	[leadtrainerId] int not null,
+	FOREIGN KEY([leadtrainerId]) REFERENCES [dbo].tTrainer ([trainerId])
 
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tTrainerQualification(
-	trainerId int foreign key references ttrainer(trainerid),
-	[courseCode] [nvarchar] (4) foreign key references tcourse(code),
+	trainerId int foreign key references tTrainer(trainerId),
+	[courseCode] [nvarchar] (4) foreign key references tCourse(code),
 	primary key(trainerId,courseCode)
 ) ON [PRIMARY]
 GO
-CREATE TABLE [dbo].tcourseinstance(
-	[CourseCode] [nvarchar] (4) NOT NULL ,
-	[CourseDate] [datetime] NOT NULL,
-	[TrainerId] int not null,
-	[RoomId] int not null,
-	PRIMARY KEY(CourseCode, CourseDate),
-	FOREIGN KEY([CourseCode]) REFERENCES [dbo].[tcourse] ([Code]),
-	FOREIGN KEY([Trainerid]) REFERENCES [dbo].ttrainer ([trainerid]),
-	FOREIGN KEY([RoomId]) REFERENCES [dbo].troom ([Roomid])
+CREATE TABLE [dbo].tCourseInstance(
+	[courseCode] [nvarchar] (4) NOT NULL ,
+	[courseDate] [datetime] NOT NULL,
+	[trainerId] int not null,
+	[roomId] int not null,
+	PRIMARY KEY(courseCode, courseDate),
+	FOREIGN KEY([courseCode]) REFERENCES [dbo].[tCourse] ([code]),
+	FOREIGN KEY([trainerId]) REFERENCES [dbo].tTrainer ([trainerId]),
+	FOREIGN KEY([roomId]) REFERENCES [dbo].tRoom ([roomId])
 ) ON [PRIMARY]
 GO
-CREATE TABLE [dbo].tdelegate(
-	[CourseCode] [nvarchar] (4) NOT NULL ,
-	[CourseDate] [datetime] NOT NULL,
-	[ClientNumber] int not null,
-	primary key(CourseCode, Coursedate,ClientNumber),
-	foreign key(CourseCode,CourseDate) references tcourseinstance(CourseCode,CourseDate),
-	foreign key(clientnumber) references tclient(clientnumber)
+CREATE TABLE [dbo].tDelegate(
+	[courseCode] [nvarchar] (4) NOT NULL ,
+	[courseDate] [datetime] NOT NULL,
+	[clientNumber] int not null,
+	primary key(courseCode, courseDate,clientNumber),
+	foreign key(courseCode,courseDate) references tCourseInstance(courseCode,courseDate),
+	foreign key(clientNumber) references tClient(clientNumber)
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tFacility(
@@ -101,20 +101,20 @@ CREATE TABLE [dbo].tFacility(
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tRoomFacility(
-	roomId   int  foreign key references troom(roomid),
-	facilityId   int foreign key references tfacility(facilityid),
-	primary key(roomid,facilityid)
+	roomId   int  foreign key references tRoom(roomId),
+	facilityId   int foreign key references tFacility(facilityid),
+	primary key(roomId,facilityid)
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tCourseFacility(
-	CourseCode [nvarchar](4)  foreign key references tcourse(code),
-	facilityId   int foreign key references tfacility(facilityid),
-	primary key(CourseCode,facilityid)
+	courseCode [nvarchar](4)  foreign key references tCourse(code),
+	facilityId   int foreign key references tFacility(facilityid),
+	primary key(courseCode,facilityid)
 ) ON [PRIMARY]
 GO
 set dateformat dmy
 
-INSERT INTO [dbo].[tclient]
+INSERT INTO [dbo].[tClient]
            ([clientNumber]
            ,[surname]
            ,[forename]
@@ -227,7 +227,7 @@ insert into [dbo].[tRoomFacility]
 			(4, 1),
 			(5, 1)
 go
-insert into [dbo].[ttrainer]
+insert into [dbo].[tTrainer]
            (surname
 		   ,forename
 		   ,[address]
@@ -238,12 +238,12 @@ insert into [dbo].[ttrainer]
 		   ('Parsnip','Jill','13 southover street, bn2 1as','jilly256@hotmail.com'),
 		   ('French','Glynn','23 acacia road, cr0 3ph','spaceman@arrarrarr.com')
 go
-INSERT INTO [dbo].[tcourse]
-           ([Title]
-           ,[Code]
-           ,[Duration]
-           ,[Cost]
-		   ,[leadTrainerId])
+INSERT INTO [dbo].[tCourse]
+           ([title]
+           ,[code]
+           ,[duration]
+           ,[cost]
+		   ,[leadtrainerId])
      VALUES
            ('RedSoft overview'
            ,'RS01'
@@ -294,7 +294,7 @@ INSERT INTO [dbo].[tcourse]
 
 go
 insert into [dbo].[tCourseFacility]
-		(CourseCode
+		(courseCode
 			,facilityId)
 		VALUES
 			('RS01', 1),
@@ -320,11 +320,11 @@ insert into tTrainerQualification
 		(4,'MP01'),
 		(4,'RC22')
 go
-INSERT INTO [dbo].[tcourseinstance]
-           ([CourseCode]
-           ,[CourseDate]
-           ,[TrainerId]
-		   ,[RoomId])
+INSERT INTO [dbo].[tCourseInstance]
+           ([courseCode]
+           ,[courseDate]
+           ,[trainerId]
+		   ,[roomId])
      VALUES
            ('RS01'
            ,CAST('1/12/2018' AS DATETIME)
@@ -384,10 +384,10 @@ INSERT INTO [dbo].[tcourseinstance]
 		   ,5)		
 GO
 
-INSERT INTO [dbo].[tdelegate]
-           ([CourseCode]
-           ,[CourseDate]
-           ,[ClientNumber])
+INSERT INTO [dbo].[tDelegate]
+           ([courseCode]
+           ,[courseDate]
+           ,[clientNumber])
      VALUES
            ('RS01'
            ,CAST('1/12/2018' AS DATETIME)
@@ -434,7 +434,7 @@ INSERT INTO [dbo].[tdelegate]
 
 drop view [dbo].[vwTrainerQualificationsTest]
 drop view [dbo].vwExpensiveCourses
-drop view [dbo].vwMediumDurationCourses
+drop view [dbo].vwMediumdurationCourses
 drop view [dbo].vwRedbaseCourses
 drop view [dbo].vwSumCourses
 drop view [dbo].vwCoursesLessThan
@@ -448,63 +448,63 @@ go
 --test view to see what course a trainer can deliver
 CREATE VIEW [dbo].[vwTrainerQualificationsTest]
 AS
-SELECT        dbo.tTrainer.trainerId, dbo.tTrainer.Surname, dbo.tTrainer.Forename, dbo.tTrainer.Address, dbo.tTrainer.Email, dbo.tTrainerQualification.trainerId AS Expr1, dbo.tTrainerQualification.courseCode
+SELECT        dbo.tTrainer.trainerId, dbo.tTrainer.surname, dbo.tTrainer.forename, dbo.tTrainer.Address, dbo.tTrainer.email, dbo.tTrainerQualification.trainerId AS Expr1, dbo.tTrainerQualification.courseCode
 FROM            dbo.tTrainer INNER JOIN
                          dbo.tTrainerQualification ON dbo.tTrainer.trainerId = dbo.tTrainerQualification.trainerId
 GO
 
 CREATE VIEW [dbo].vwExpensiveCourses
 AS
-SELECT        Title, Code, Duration, Cost
-FROM            dbo.tcourse
-WHERE        (Cost > 800)
+SELECT        title, code, duration, cost
+FROM            dbo.tCourse
+WHERE        (cost > 800)
 go
-CREATE VIEW [dbo].vwMediumDurationCourses
+CREATE VIEW [dbo].vwMediumdurationCourses
 AS
-SELECT        Title, Code, Duration, Cost
-FROM            dbo.tcourse
-WHERE        (Duration BETWEEN 2 AND 4)
+SELECT        title, code, duration, cost
+FROM            dbo.tCourse
+WHERE        (duration BETWEEN 2 AND 4)
 go
 CREATE VIEW [dbo].vwRedbaseCourses
 AS
-SELECT        Title, Code, Duration, Cost
-FROM            dbo.tcourse
-WHERE        (Title LIKE '%redbase%')
+SELECT        title, code, duration, cost
+FROM            dbo.tCourse
+WHERE        (title LIKE '%redbase%')
 GO
 CREATE VIEW [dbo].vwSumCourses
 AS
-SELECT        SUM(Cost) AS total
-FROM            dbo.tcourse
+SELECT        SUM(cost) AS total
+FROM            dbo.tCourse
 go
 CREATE VIEW [dbo].vwSum4GLCourses
 AS
-SELECT        SUM(Cost) AS total
-FROM            dbo.tcourse
-WHERE        (Title LIKE '%4GL%')
+SELECT        SUM(cost) AS total
+FROM            dbo.tCourse
+WHERE        (title LIKE '%4GL%')
 go
 CREATE VIEW [dbo].vwCoursesLessThan
 AS
-SELECT        Title, Code, Duration, Cost
-FROM            dbo.tcourse
-WHERE        (Duration < 3) OR
-                         (Cost < 500)
+SELECT        title, code, duration, cost
+FROM            dbo.tCourse
+WHERE        (duration < 3) OR
+                         (cost < 500)
 go
 create view [dbo].vwCourseInstanceDates
 as
-select ci.coursedate from tcourse c join tcourseinstance ci
-on c.code = ci.coursecode
+select ci.courseDate from tCourse c join tCourseInstance ci
+on c.code = ci.courseCode
 go
 create view [dbo].vwCoursesTaughtByKatie
 as
-select * from tcourse c join tcourseinstance ci
-on c.code = ci.coursecode
-where trainerid = 1
+select * from tCourse c join tCourseInstance ci
+on c.code = ci.courseCode
+where trainerId = 1
 go
 create view [dbo].vwCoursesLongerThan1dAfterFeb2013
 as
-select * from tcourse c join tcourseinstance ci
-on c.code = ci.coursecode
-where coursedate > '1/3/2013'
+select * from tCourse c join tCourseInstance ci
+on c.code = ci.courseCode
+where courseDate > '1/3/2013'
 
 go
 
@@ -531,23 +531,23 @@ select @vmaxid = max(trainerId) from [dbo].[tTrainer]
 	begin try
 		begin transaction
 			INSERT INTO [dbo].[tTrainer]
-				   ([Surname]
-				   ,[Forename]
-				   ,[Address]
-				   ,[Email])
+				   ([surname]
+				   ,[forename]
+				   ,[address]
+				   ,[email])
 			 VALUES
-				   (@Surname
-				   ,@Forename
+				   (@surname
+				   ,@forename
 				   ,@Address
-				   ,@Email)
-			insert into [dbo].[tTrainerQualification] (trainerid, coursecode)
+				   ,@email)
+			insert into [dbo].[tTrainerQualification] (trainerId, courseCode)
 			SELECT @@identity as tid,value FROM string_split(@qualifications,',')
 		commit transaction
 
 		--we'll return the courses for the next two months for that new trainer
-		select coursecode, coursedate from [dbo].[tcourseinstance] 
-		where coursecode in (select value from string_split(@qualifications,',')) 
-			and coursedate between GETDATE() and DATEADD(m,2,GETDATE())
+		select courseCode, courseDate from [dbo].[tCourseInstance] 
+		where courseCode in (select value from string_split(@qualifications,',')) 
+			and courseDate between GETDATE() and DATEADD(m,2,GETDATE())
 
 	end try
 	begin catch
