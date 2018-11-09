@@ -27,6 +27,7 @@ drop table [dbo].tTrainerQualification
 drop table [dbo].tCourse 
 drop table [dbo].tTrainer
 drop table [dbo].tClient
+drop procedure [dbo].spAddNewTrainer 
 
 CREATE TABLE [dbo].tBuilding(
 	buildingId   int primary key NOT NULL,
@@ -515,8 +516,7 @@ go
 -- Description:	Allows the addition of a trainer and their skillz (qualifications)
 --				skillz, should be the course coded as csv e.g. 'RS01','B401' etc.
 -- =============================================
---CREATE PROCEDURE spAddNewTrainer
-Alter PROCEDURE spAddNewTrainer
+CREATE PROCEDURE spAddNewTrainer
 	@surname nvarchar(30),
 	@forename nvarchar(20),
 	@address ntext,
@@ -551,10 +551,8 @@ select @vmaxid = max(trainerId) from [dbo].[tTrainer]
 
 	end try
 	begin catch
-	  raiserror('Failed to add trainer.  check your input!  does name, address and email satisfy their constraints?', 16, 1)
-	  rollback transaction
-		print 'identity in catch block'
-		print @@identity	  
+	  raiserror('Failed to add trainer.  Check your input!  Does name, address and email satisfy their constraints?', 16, 1)
+	  rollback transaction  
 		--reseed the identity value
 		set @vmaxid = @vmaxid
 		DBCC CHECKIDENT (tTrainer, reseed, @vmaxid)
