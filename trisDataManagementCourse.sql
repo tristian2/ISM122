@@ -56,8 +56,8 @@ CREATE TABLE [dbo].tTrainer(
 	forename nvarchar(20) not null CHECK(forename<>N''),
 	[address] nvarchar(max) not null CHECK ([address]<>N''),
 	email varchar(254) not null CHECK(email LIKE '%___@___%.__%')
-	--this was an idea, but problem of circular keys! FOREIGN KEY([trainerId]) REFERENCES tTrainerQualification (trainerQualificationId)
-
+	--this was an idea, but problem of circular keys! 
+	--FOREIGN KEY([trainerId]) REFERENCES tTrainerQualification (trainerQualificationId)
 ) ON [PRIMARY]
 GO
 CREATE TABLE [dbo].tCourse(
@@ -544,7 +544,7 @@ select @vmaxid = max(trainerId) from [dbo].[tTrainer]
 			SELECT @@identity as tid,value FROM string_split(@qualifications,',')
 		commit transaction
 
-		--we'll return the courses for the next two months for that new trainer
+		--we'll return the course instances the new trainer can deliver for the next two months
 		select courseCode, courseDate from [dbo].[tCourseInstance] 
 		where courseCode in (select value from string_split(@qualifications,',')) 
 			and courseDate between GETDATE() and DATEADD(m,2,GETDATE())
