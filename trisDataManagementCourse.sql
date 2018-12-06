@@ -1,5 +1,5 @@
 /* redsoft training materials scripts
-if using my machine, use the command blow to open an instance of sql server management studio
+if using my machine, use the command below to open an instance of sql server management studio
 runas /netonly /user:UNIVERSITY\tso14 ssms.exe
 tristian o'brien october 2018*/
 
